@@ -1,8 +1,9 @@
 class User < ActiveRecord::Base
   #before_save {email.downcase!}
+  has_many :microposts, dependent: :destroy
   before_create :create_remember_token
   before_save { self.email = email.downcase } #存入数据库前全部小写
-  validates :name, presence:  true, length: { maximum: 14}
+  validates :name, presence:  true, length: { maximum: 50}
   VALID_EMAIL_REGEX =  /\A[\w+\-.]+@[a-z\d\-]+(\.[a-z]+)*\.[a-z]+\z/i
   validates :email, presence:  true,
             format: { with: VALID_EMAIL_REGEX },
@@ -16,6 +17,10 @@ class User < ActiveRecord::Base
 
   def User.encrypt(token)
     Digest::SHA1.hexdigest(token.to_s)
+  end
+
+  def feed
+    microposts
   end
 
   private
